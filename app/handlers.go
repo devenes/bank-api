@@ -3,7 +3,7 @@ package app
 import (
 	"encoding/json"
 	"encoding/xml"
-	"fmt"
+	"github.com/devenes/bank-api/service"
 	"net/http"
 )
 
@@ -13,12 +13,13 @@ type Customer struct {
 	Zipcode int    `json:"zipcode" xml:"zipcode"`
 }
 
-func greet(w http.ResponseWriter, r *http.Request) {
-	fmt.Fprintf(w, "Hello World")
+type CustomerHandlers struct {
+	service service.CustomerService // dependency injection
+
 }
 
-func getAllCustomers(w http.ResponseWriter, r *http.Request) {
-	customers := []Customer{
+func (ch *CustomerHandlers) getAllCustomers(w http.ResponseWriter, r *http.Request) {
+	/*	customers := []Customer{
 		Customer{
 			Name:    "John",
 			City:    "New York",
@@ -29,6 +30,12 @@ func getAllCustomers(w http.ResponseWriter, r *http.Request) {
 			City:    "New York",
 			Zipcode: 10001,
 		},
+	}*/
+	customers, err := ch.service.GetAllCustomer()
+	if err != nil {
+		// handle the error
+		w.WriteHeader(http.StatusInternalServerError)
+		return
 	}
 
 	if r.Header.Get("Content-Type") == "application/xml" {

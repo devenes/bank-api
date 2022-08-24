@@ -2,6 +2,8 @@ package app
 
 import (
 	"fmt"
+	"github.com/devenes/bank-api/domain"
+	"github.com/devenes/bank-api/service"
 	"github.com/gorilla/mux"
 	"log"
 	"net/http"
@@ -12,11 +14,11 @@ func Start() {
 	// mux := http.NewServeMux()
 	router := mux.NewRouter()
 
+	// wiring up the handlers
+	ch := CustomerHandlers{service: service.NewCustomerService(domain.NewCustomerRepositoryStub())}
+
 	// declare a new router
-	router.HandleFunc("/greet", greet).Methods(http.MethodGet)
-	router.HandleFunc("/customers", getAllCustomers).Methods(http.MethodGet)
-	router.HandleFunc("/customers", createCustomer).Methods(http.MethodPost)
-	router.HandleFunc("/customers/{customer_id:[0-9]+}", getCustomer).Methods(http.MethodGet)
+	router.HandleFunc("/customers", ch.getAllCustomers).Methods(http.MethodGet)
 
 	// Start the server
 	log.Fatalf("Server failed to start: %v", http.ListenAndServe("localhost:8080", router))
